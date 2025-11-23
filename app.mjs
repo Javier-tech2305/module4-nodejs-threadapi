@@ -43,7 +43,7 @@ async function main() {
                     email,
                     password
                 });
-                const token = jwt.sign(
+               /* const token = jwt.sign(
                     { userId: newUser.id },
                     JWT_SECRET,
                     { expiresIn: '1h' });
@@ -54,7 +54,7 @@ async function main() {
                     console.log(error)
                 }
 
-                res.cookie('token', token, { httpOnly:true });
+                res.cookie('token', token, { httpOnly:true });*/
                 res.json({
                     Message: 'successfully registered',
                     User: newUser
@@ -67,13 +67,56 @@ async function main() {
             }
         });
 
-        /*
         app.post("/login", async(req,res)=>{
-
             
+            try {
+                const { email, password } = req.body;
+
+                if (!email || !password) {
+
+                    return res.status(400).json({ Message: 'Email and password are required' })
+                }
+                
+                const user = await User.findOne({ where: { email: email } });
+                
+                if (user == null) {
+                    
+                    return res.status(400).json({ Message: 'Account don\'t exists' })
+                }
+                //revisar manana
+                if (bcrypt.compareSync(password, user.password)) {
+                    
+                    return res.status(400).json({ Message: 'Incorrect password' })
+
+
+                }
+                
+                const token = jwt.sign(
+                    { userId: user.id },
+                    JWT_SECRET,
+                    { expiresIn: '1h' });
+
+                if (jwt.verify(token, JWT_SECRET)) {
+                    console.log(token)
+                } else {
+                    console.log(error)
+                }
+
+                res.cookie('token', token, { httpOnly:true });
+                res.json({
+                    Message: 'successfully logged in',
+                    User: user
+                });
+
+
+            } catch (error) {
+                console.log(error)
+                return res.status(400).json({ Message: 'Log in failed, please try again' })
+            }
             
         });
         
+        /*
         app.get();
         app.get();
         

@@ -57,22 +57,22 @@ export async function loadSequelize() {
             {
                 content: DataTypes.STRING
             });
-
-        await sequelize.sync({ force: true });
-
-        const User = sequelize.models.User;
-        const Post = sequelize.models.Post;
-        const Comment = sequelize.models.Comment;
-
-        User.hasMany(Post);
-        Post.belongsTo(User);
-
-        User.hasMany(Comment);
-        Comment.belongsTo(User);
-
-        Post.hasMany(Comment);
-        Comment.belongsTo(Post);
-
+            
+            
+            const User = sequelize.models.User;
+            const Post = sequelize.models.Post;
+            const Comment = sequelize.models.Comment;
+            
+            User.hasMany(Post);
+            Post.belongsTo(User);
+            
+            User.hasMany(Comment);
+            Comment.belongsTo(User);
+            
+            Post.hasMany(Comment);
+            Comment.belongsTo(Post);
+            
+            await sequelize.sync({force:true});
 
         return sequelize;
 

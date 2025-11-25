@@ -1,11 +1,12 @@
 import { loadSequelize } from "./database.mjs";
 import express, { urlencoded } from "express";
-import cors from "cors";
 import bcrypt from "bcrypt";
 import jwt from 'jsonwebtoken';
 import cookieParser from 'cookie-parser';
-import { where } from "sequelize";
 import { verifyTokenJWT } from './node_modules/middleware/verifyTokenJWT.mjs';
+
+
+
 
 /**
  * Point d'entrée de l'application
@@ -16,12 +17,14 @@ async function main() {
         const app = express();
         app.use(express.json());
         app.use(cookieParser());
+        
         const sequelize = await loadSequelize();
-        //console.log(sequelize.models)
+        
         const User = sequelize.models.User;
         const Post = sequelize.models.Post;
         const Comment = sequelize.models.Comment;
-        const JWT_SECRET = "secret_cle";// esto va en archivo.env
+    
+        const JWT_SECRET = process.env.JWT_SECRET;
 
         //----------------------------------------- PUBLIC------------------------------------------------------//
         app.post("/register", async (req, res) => {
@@ -106,7 +109,7 @@ async function main() {
 
             try {
 
-                const allPosts = await Post.findAll({ raw: true, include:Comment });
+                const allPosts = await Post.findAll({include:Comment });
                 if(!allPosts){
                     return res.status(400).json({ Message: 'No posts to show!' })
                 }
@@ -122,8 +125,6 @@ async function main() {
             }
 
         });
-
-        //verificar para mostrar los comentarios
 
         app.get("/users/:userid/:posts", async (req, res) => {
 
@@ -180,7 +181,7 @@ async function main() {
         app.post("/posts/:postID", async (req, res) => {
 
             try {
-                
+
                 const commentData = req.body;
                 const newComment = await Comment.create({
                     content: commentData.comment,

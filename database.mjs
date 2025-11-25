@@ -8,12 +8,17 @@ import bcrypt from "bcrypt";
 export async function loadSequelize() {
 
     try {
+        const db_name = process.env.DB_NAME;
+        const db_user = process.env.DB_USER;
+        const db_password = process.env.DB_PASSWORD;
+        const db_host = process.env.DB_HOST;
         const sequelize = new Sequelize(
-            'api-tread',
-            'root',
-            'root',
+            db_name,
+            db_user,
+            db_password,
+            
             {
-                host: '127.0.0.1',
+                db_host,
                 dialect: 'mysql'
             }
 
@@ -63,13 +68,25 @@ export async function loadSequelize() {
             const Post = sequelize.models.Post;
             const Comment = sequelize.models.Comment;
             
-            User.hasMany(Post);
+            User.hasMany(Post,
+                {
+                    onDelete : 'cascade'
+                }
+            );
             Post.belongsTo(User);
             
-            User.hasMany(Comment);
+            User.hasMany(Comment,
+                {
+                    onDelete : 'cascade'
+                }
+            );
             Comment.belongsTo(User);
             
-            Post.hasMany(Comment);
+            Post.hasMany(Comment,
+                {
+                    onDelete: 'cascade'
+                }
+            );
             Comment.belongsTo(Post);
             
             await sequelize.sync({force:true});
